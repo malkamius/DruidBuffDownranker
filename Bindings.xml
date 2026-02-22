@@ -1,0 +1,6 @@
+<Bindings>
+	<Binding name="CLICK SmartMotW:LeftButton" category="Druid Buff Downranker">
+	</Binding>
+	<Binding name="CLICK SmartThorns:LeftButton" category="Druid Buff Downranker">
+	</Binding>
+</Bindings>
