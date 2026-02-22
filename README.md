@@ -40,9 +40,11 @@ Settings can be toggled through the standard interface options:
 
 ## Installation
 
-1.  Download the repository.
-2.  Extract the `DruidBuffDownranker` folder to your WoW Classic `Interface/AddOns` directory.
-3.  Restart World of Warcraft or type `/reload` if you are already in-game.
+1.  Download the repository as a ZIP.
+2.  Extract the contents to your WoW Classic `Interface/AddOns` directory.
+3.  **Crucial**: Rename the extracted folder (e.g., `DruidBuffDownranker-main`) to exactly `DruidBuffDownranker`. If the folder name does not match, the addon will not load.
+4.  Restart World of Warcraft or type `/reload` if you are already in-game.
+
 
 ---
 *Created for TBC Classic Anniversary.*
