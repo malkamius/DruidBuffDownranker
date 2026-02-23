@@ -19,6 +19,9 @@ local SPELL_DATA = {
         {rank = 3, level = 24, minTargetLevel = 14, id = 1075},
         {rank = 2, level = 14, minTargetLevel = 4,  id = 782},
         {rank = 1, level = 6,  minTargetLevel = 1,  id = 467},
+    },
+    ["Omen of Clarity"] = {
+        {rank = 1, level = 20, minTargetLevel = 20, id = 16864},
     }
 }
 
@@ -40,9 +43,10 @@ local function UpdateKnownRanks()
                 KNOWN_RANKS[spellName][data.rank] = true
             else
                 KNOWN_RANKS[spellName][data.rank] = false
-                -- Notification for untrained ranks
-                if playerLevel >= data.level and not NOTIFIED_UNTRAINED[spellName .. data.rank] then
-                    print("|cFFFFFF00[DruidBuff]|r You can train |cFF00FF00" .. spellName .. " (Rank " .. data.rank .. ")|r at your level!")
+                -- Notification for untrained ranks (Omen is a talent, no need to notify)
+                if spellName ~= "Omen of Clarity" and playerLevel >= data.level and not NOTIFIED_UNTRAINED[spellName .. data.rank] then
+                    local nameDisplay = spellName .. " (Rank " .. data.rank .. ")"
+                    print("|cFFFFFF00[DruidBuff]|r You can train |cFF00FF00" .. nameDisplay .. "|r at your level!")
                     NOTIFIED_UNTRAINED[spellName .. data.rank] = true
                 end
             end
@@ -51,19 +55,22 @@ local function UpdateKnownRanks()
 end
 
 -- Settings State
-local DruidBuffSettings = {
-    ["Mark of the Wild"] = { mouseover = true },
-    ["Thorns"] = { mouseover = true }
+DruidBuffSettings = DruidBuffSettings or {
+    ["Mark of the Wild"] = { mouseover = true, show = true },
+    ["Thorns"] = { mouseover = true, show = true },
+    ["Omen of Clarity"] = { show = true },
+    showActionBar = true
 }
 
 -- --- KEYBINDING LOCALIZATION ---
 _G["BINDING_HEADER_DRUIDBUFFDR_HEADER"] = "Druid Buff Downranker"
 _G["BINDING_NAME_CLICK SmartMotW:LeftButton"] = "Cast Smart MotW"
 _G["BINDING_NAME_CLICK SmartThorns:LeftButton"] = "Cast Smart Thorns"
+_G["BINDING_NAME_CLICK SmartOmen:LeftButton"] = "Cast Smart Omen"
 
 -- Create the Container Frame
 local bar = CreateFrame("Frame", "DruidBuffBar", UIParent)
-bar:SetSize(90, 45)
+bar:SetSize(110, 60)
 bar:SetPoint("CENTER", UIParent, "CENTER", 0, -100)
 bar:SetMovable(true)
 bar:EnableMouse(true)
@@ -72,7 +79,7 @@ bar:RegisterForDrag("LeftButton")
 
 bar.bg = bar:CreateTexture(nil, "BACKGROUND")
 bar.bg:SetAllPoints()
-bar.bg:SetColorTexture(0, 0, 0, 0.3)
+bar.bg:SetColorTexture(0, 0, 0, 0.5)
 
 bar:SetScript("OnDragStart", function(self) 
     if IsShiftKeyDown() then self:StartMoving() end 
@@ -100,20 +107,46 @@ local title = optionsFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge
 title:SetPoint("TOPLEFT", 16, -16)
 title:SetText("Druid Buff Downranker Settings")
 
-local function CreateToggle(spellName, yOffset)
-    local cb = CreateFrame("CheckButton", "DruidBuffCheck_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
-    cb:SetPoint("TOPLEFT", 16, yOffset)
-    local cbText = _G[cb:GetName().."Text"]
-    if cbText then cbText:SetText("Enable Mouseover for "..spellName) end
-    cb:SetChecked(DruidBuffSettings[spellName].mouseover)
-    cb:SetScript("OnClick", function(self)
-        DruidBuffSettings[spellName].mouseover = self:GetChecked()
+local function CreateToggle(spellName, yOffset, hasMouseover)
+    local cbShow = CreateFrame("CheckButton", "DruidBuffCheck_Show_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+    cbShow:SetPoint("TOPLEFT", 16, yOffset)
+    _G[cbShow:GetName().."Text"]:SetText("Show "..spellName)
+    cbShow:SetChecked(DruidBuffSettings[spellName].show)
+    cbShow:SetScript("OnClick", function(self)
+        DruidBuffSettings[spellName].show = self:GetChecked()
+        if DruidBuffBar then
+            -- We need a global way to update layout, we will implement UpdateActionBarLayout shortly
+            if UpdateActionBarLayout then UpdateActionBarLayout() end
+        end
     end)
-    return cb
+    
+    if hasMouseover then
+        local cbMouse = CreateFrame("CheckButton", "DruidBuffCheck_Mouse_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+        cbMouse:SetPoint("TOPLEFT", 180, yOffset)
+        _G[cbMouse:GetName().."Text"]:SetText("Enable Mouseover")
+        cbMouse:SetChecked(DruidBuffSettings[spellName].mouseover)
+        cbMouse:SetScript("OnClick", function(self)
+            DruidBuffSettings[spellName].mouseover = self:GetChecked()
+        end)
+    end
 end
 
-CreateToggle("Mark of the Wild", -50)
-CreateToggle("Thorns", -80)
+CreateToggle("Mark of the Wild", -50, true)
+CreateToggle("Thorns", -80, true)
+CreateToggle("Omen of Clarity", -110, false)
+
+local showBarToggle = CreateFrame("CheckButton", "DruidBuffCheck_ShowActionBar", optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+showBarToggle:SetPoint("TOPLEFT", 16, -150)
+_G[showBarToggle:GetName().."Text"]:SetText("Show Action Bar")
+showBarToggle:SetChecked(DruidBuffSettings.showActionBar)
+showBarToggle:SetScript("OnClick", function(self)
+    DruidBuffSettings.showActionBar = self:GetChecked()
+    if self:GetChecked() then
+        DruidBuffBar:Show()
+    else
+        DruidBuffBar:Hide()
+    end
+end)
 
 -- Using RegisterCanvasLayoutSubcategory is the correct way to handle nesting in modern WoW/TBC Classic
 local subCategory = Settings.RegisterCanvasLayoutSubcategory(druidCategory, optionsFrame, "BuffDownranker")
@@ -134,8 +167,8 @@ local function UpdateButtonRank(btn)
     local targetLevel = UnitLevel(unit)
     local rankText = ""
 
-    if targetLevel and targetLevel > 0 then
-        local ranks = SPELL_DATA[spellName]
+    local ranks = SPELL_DATA[spellName]
+    if spellName ~= "Omen of Clarity" and targetLevel and targetLevel > 0 then
         for _, data in ipairs(ranks) do
             -- Selection logic:
             -- 1. We must know the rank (trained)
@@ -147,6 +180,9 @@ local function UpdateButtonRank(btn)
                 end
             end
         end
+    elseif spellName == "Omen of Clarity" then
+        rankText = "" -- Omen has no rank text in its spell name
+        unit = "player" -- Omen is always self
     end
 
     local macroText = "/cast [@" .. unit .. ",exists][@player] " .. spellName .. rankText
@@ -158,7 +194,7 @@ end
 local function CreateBuffButton(name, spellName, icon, parent, xOffset)
     local btn = CreateFrame("Button", name, parent, "SecureActionButtonTemplate")
     btn:SetSize(40, 40)
-    btn:SetPoint("LEFT", parent, "LEFT", xOffset + 2, 0)
+    btn:SetPoint("LEFT", parent, "LEFT", xOffset, 0)
     btn.baseSpell = spellName
 
     btn.tex = btn:CreateTexture(nil, "BACKGROUND")
@@ -172,6 +208,7 @@ local function CreateBuffButton(name, spellName, icon, parent, xOffset)
     btn:SetScript("OnEvent", function(self, event) 
         if event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
             UpdateKnownRanks()
+            if UpdateActionBarLayout then UpdateActionBarLayout() end
         end
         UpdateButtonRank(self) 
     end)
@@ -197,6 +234,55 @@ end
 UpdateKnownRanks()
 
 local motwBtn = CreateBuffButton("SmartMotW", "Mark of the Wild", "Interface\\Icons\\Spell_Nature_Regeneration", bar, 0)
-local thornsBtn = CreateBuffButton("SmartThorns", "Thorns", "Interface\\Icons\\Spell_Nature_Thorns", bar, 45)
+local thornsBtn = CreateBuffButton("SmartThorns", "Thorns", "Interface\\Icons\\Spell_Nature_Thorns", bar, 0)
+local omenBtn = CreateBuffButton("SmartOmen", "Omen of Clarity", "Interface\\Icons\\Spell_Nature_CrystalBall", bar, 0)
+
+-- Global layout function so options can trigger it
+function UpdateActionBarLayout()
+    local _, playerClass = UnitClass("player")
+    if playerClass ~= "DRUID" then
+        if bar then bar:Hide() end
+        return
+    end
+
+    local xOffset = 10
+    local visibleButtons = 0
+    
+    local function LayoutButton(btn)
+        local spellName = btn.baseSpell
+        local hasKnownRank = false
+        if KNOWN_RANKS[spellName] then
+            for _, known in pairs(KNOWN_RANKS[spellName]) do
+                if known then hasKnownRank = true break end
+            end
+        end
+
+        if DruidBuffSettings[spellName] and DruidBuffSettings[spellName].show and hasKnownRank then
+            btn:Show()
+            btn:SetPoint("LEFT", bar, "LEFT", xOffset, 0)
+            xOffset = xOffset + 45
+            visibleButtons = visibleButtons + 1
+        else
+            btn:Hide()
+        end
+    end
+    
+    LayoutButton(motwBtn)
+    LayoutButton(thornsBtn)
+    LayoutButton(omenBtn)
+    
+    if visibleButtons > 0 then
+        bar:SetSize((visibleButtons * 45) + 20, 60)
+        if DruidBuffSettings.showActionBar then
+            bar:Show()
+        else
+            bar:Hide()
+        end
+    else
+        bar:Hide()
+    end
+end
+
+UpdateActionBarLayout()
 
 print("|cFF00FF00DruidBuffDownranker Loaded!|r Settings: Options > Addons > Druid > BuffDownranker")

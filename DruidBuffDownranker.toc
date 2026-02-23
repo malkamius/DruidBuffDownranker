@@ -6,4 +6,5 @@
 ## X-Category: Buffs/Debuffs
 ## Category: Buffs/Debuffs
 ## IconTexture: Interface\Icons\Spell_Nature_Regeneration
+## SavedVariables: DruidBuffSettings
 DruidBuffDownranker.lua
