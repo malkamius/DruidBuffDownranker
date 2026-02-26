@@ -29,6 +29,10 @@ smartBtn:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")
 smartBtn:RegisterForClicks("LeftButtonDown", "AnyDown")
 smartBtn:SetAttribute("type", "macro")
 
+local smartBtnCD = CreateFrame("Cooldown", "SmartBuffAutoBtnCooldown", smartBtn, "CooldownFrameTemplate")
+smartBtnCD:SetHideCountdownNumbers(false)
+smartBtnCD:SetAllPoints()
+
 local function GetUnitTargetLevel(unit)
     local targetLevel = UnitLevel(unit)
     if not targetLevel or targetLevel <= 0 then
@@ -155,16 +159,38 @@ local function UpdateSmartBuffButton()
         smartBtn:SetAttribute("macrotext", macroText)
         smartBtn:SetAttribute("macrotext1", macroText)
         smartBtn.tex:SetTexture(icon)
-        smartBtn.tex:SetDesaturated(false)
+        
+        local start, duration, enabled = GetSpellCooldown(spell)
+        if start and duration and duration > 0 and enabled == 1 then
+            smartBtnCD:SetCooldown(start, duration)
+            smartBtn.tex:SetDesaturated(true)
+            smartBtn.tex:SetVertexColor(0.5, 0.5, 0.5)
+        else
+            smartBtnCD:SetCooldown(0, 0)
+            smartBtn.tex:SetDesaturated(false)
+            smartBtn.tex:SetVertexColor(1, 1, 1)
+        end
+        
         smartBtn:SetAlpha(1.0)
     else
         smartBtn:SetAttribute("macrotext", "")
         smartBtn:SetAttribute("macrotext1", "")
         smartBtn.tex:SetTexture("Interface\\Icons\\Spell_Nature_Regeneration")
         smartBtn.tex:SetDesaturated(true)
+        smartBtn.tex:SetVertexColor(1, 1, 1)
         smartBtn:SetAlpha(0.5)
+        smartBtnCD:SetCooldown(0, 0)
     end
 end
+
+smartBtn:SetScript("OnUpdate", function(self, elapsed)
+    if InCombatLockdown() then return end
+    self._cdTimer = (self._cdTimer or 0) + elapsed
+    if self._cdTimer > 0.1 then
+        self._cdTimer = 0
+        UpdateSmartBuffButton()
+    end
+end)
 
 function addonTable.UpdateSmartBarVisibility()
     if not DruidBuffSettings then return end
@@ -186,6 +212,7 @@ scannerFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
 scannerFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 scannerFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 scannerFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+scannerFrame:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 scannerFrame:SetScript("OnEvent", function(self, event, ...)
     if not InCombatLockdown() then
         UpdateSmartBuffButton()

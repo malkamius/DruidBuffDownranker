@@ -2,7 +2,7 @@
 ## Title: DruidBuffDownranker
 ## Notes: Automatically selects the correct rank of MotW and Thorns for your target when out of combat.
 ## Author: Gemini
-## Version: 1.1
+## Version: 1.3
 ## X-Category: Buffs/Debuffs
 ## Category: Buffs/Debuffs
 ## IconTexture: Interface\Icons\Spell_Nature_Regeneration

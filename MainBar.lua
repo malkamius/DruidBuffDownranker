@@ -72,6 +72,32 @@ local function CreateBuffButton(name, spellName, icon, parent, xOffset)
     btn:RegisterForClicks("LeftButtonDown", "AnyDown")
     btn:SetAttribute("type", "macro")
 
+    btn.cd = CreateFrame("Cooldown", name.."Cooldown", btn, "CooldownFrameTemplate")
+    btn.cd:SetHideCountdownNumbers(false)
+    btn.cd:SetAllPoints()
+
+    local function UpdateButtonCooldown()
+        local start, duration, enabled = GetSpellCooldown(btn.baseSpell)
+        if start and duration and duration > 0 and enabled == 1 then
+            btn.cd:SetCooldown(start, duration)
+            btn.tex:SetDesaturated(true)
+            btn.tex:SetVertexColor(0.5, 0.5, 0.5)
+        else
+            btn.cd:SetCooldown(0, 0)
+            btn.tex:SetDesaturated(false)
+            btn.tex:SetVertexColor(1, 1, 1)
+        end
+    end
+
+    btn:SetScript("OnUpdate", function(self, elapsed)
+        -- We throttle the visual update to avoid heavy processing every frame
+        self._cdTimer = (self._cdTimer or 0) + elapsed
+        if self._cdTimer > 0.1 then
+            self._cdTimer = 0
+            UpdateButtonCooldown()
+        end
+    end)
+
     btn:SetScript("OnEvent", function(self, event) 
         UpdateButtonRank(self) 
     end)
@@ -90,6 +116,7 @@ local function CreateBuffButton(name, spellName, icon, parent, xOffset)
     -- Update is handled when things load, but we can call it here too safely out of combat
     if not InCombatLockdown() then
         UpdateButtonRank(btn)
+        UpdateButtonCooldown()
     end
     return btn
 end
