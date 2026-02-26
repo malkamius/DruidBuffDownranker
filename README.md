@@ -11,6 +11,7 @@
 -   **Draggable Interface**: A compact UI bar that can be moved anywhere on your screen.
 -   **Mouseover Support**: Optionally cast buffs on your mouseover target instead of your current target.
 -   **Full Keybinding Support**: Bind your smart-cast macros directly through the WoW Keybindings menu.
+-   **Smart Buff Party Assist**: A dynamic, draggable one-button bar that auto-targets group members who need *Mark of the Wild* or *Thorns* and casts the appropriate rank completely automatically out of combat.
 
 ## Usage
 
@@ -22,12 +23,17 @@ The addon provides a small bar with up to three icons (depending on what you've 
 
 **Movement**: Hold `Shift` and drag the bar with your Left Mouse Button to reposition it.
 
+### Smart Buff Bar (Party Assist)
+A secondary, single-button frame (the "Smart Buff Bar") is available. Clicking this button checks your group (Player, Party, Raid). If anyone is missing *Mark of the Wild*, *Thorns*, or *Omen of Clarity* (self-only), the button dynamically changes its target and casts the appropriate rank on them. Note: Target updates only occur **out of combat**, but the button is fully functional in combat for its pre-assigned target.
+
+**Movement**: Hold `Shift` and drag the button with your Left Mouse Button to reposition it.
+
 ### Keybindings
 You can set up keybindings for one-click buffing:
 1.  Open the **Game Menu** (Esc).
 2.  Go to **Keybindings**.
 3.  Scroll down to the **Druid Buff Downranker** section.
-4.  Bind "Cast Smart MotW", "Cast Smart Thorns", and "Cast Smart Omen" to your preferred keys.
+4.  Bind "Cast Smart MotW", "Cast Smart Thorns", "Cast Smart Omen", or "Cast Smart Auto Buff" to your preferred keys.
 
 ### Macros
 If you prefer using your own macros, the addon creates secure buttons you can reference:
@@ -39,7 +45,8 @@ If you prefer using your own macros, the addon creates secure buttons you can re
 Settings can be toggled through the standard interface options, and are saved globally across your characters:
 -   **Path**: `Esc > Options > AddOns > Druid > BuffDownranker`
 -   **Settings Available**: 
-    -   Show/Hide the Action Bar entirely.
+    -   Show/Hide the main Action Bar.
+    -   Show/Hide the Smart Buff Bar.
     -   Show/Hide individual buttons for *Mark of the Wild*, *Thorns*, and *Omen of Clarity*. 
     -   Enable/Disable Mouseover casting for *Mark of the Wild* and *Thorns*.
 

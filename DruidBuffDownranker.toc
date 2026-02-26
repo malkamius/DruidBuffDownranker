@@ -7,4 +7,7 @@
 ## Category: Buffs/Debuffs
 ## IconTexture: Interface\Icons\Spell_Nature_Regeneration
 ## SavedVariables: DruidBuffSettings
-DruidBuffDownranker.lua
+Core.lua
+Options.lua
+MainBar.lua
+SmartBar.lua
