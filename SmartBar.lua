@@ -92,41 +92,57 @@ local function GetGroupUnits()
     return units
 end
 
+local function InRange(spellName, unit)
+    if unit == "player" then return true end
+    local inRange = IsSpellInRange(spellName, unit)
+    return inRange == 1
+end
+
 local function FindMissingBuff()
     if not DruidBuffSettings then return nil, nil, nil, nil end
     local units = GetGroupUnits()
 
-    if DruidBuffSettings["Mark of the Wild"] and DruidBuffSettings["Mark of the Wild"].show then
-        for _, unit in ipairs(units) do
-            if IsValidBuffTarget(unit) and not HasBuff(unit, "Mark of the Wild") then
-                local rank = GetAppropriateRank("Mark of the Wild", unit)
-                if rank then
-                    return "Mark of the Wild", rank, unit, "Interface\\Icons\\Spell_Nature_Regeneration"
+    local function checkSpells(requireRange)
+        if DruidBuffSettings["Mark of the Wild"] and DruidBuffSettings["Mark of the Wild"].show then
+            for _, unit in ipairs(units) do
+                if IsValidBuffTarget(unit) and not HasBuff(unit, "Mark of the Wild") then
+                    if not requireRange or InRange("Mark of the Wild", unit) then
+                        local rank = GetAppropriateRank("Mark of the Wild", unit)
+                        if rank then
+                            return "Mark of the Wild", rank, unit, "Interface\\Icons\\Spell_Nature_Regeneration"
+                        end
+                    end
                 end
             end
         end
-    end
 
-    if DruidBuffSettings["Thorns"] and DruidBuffSettings["Thorns"].show then
-        for _, unit in ipairs(units) do
-            if IsValidBuffTarget(unit) and not HasBuff(unit, "Thorns") then
-                local rank = GetAppropriateRank("Thorns", unit)
-                if rank then
-                    return "Thorns", rank, unit, "Interface\\Icons\\Spell_Nature_Thorns"
+        if DruidBuffSettings["Thorns"] and DruidBuffSettings["Thorns"].show then
+            for _, unit in ipairs(units) do
+                if IsValidBuffTarget(unit) and not HasBuff(unit, "Thorns") then
+                    if not requireRange or InRange("Thorns", unit) then
+                        local rank = GetAppropriateRank("Thorns", unit)
+                        if rank then
+                            return "Thorns", rank, unit, "Interface\\Icons\\Spell_Nature_Thorns"
+                        end
+                    end
                 end
             end
         end
-    end
-    
-    if DruidBuffSettings["Omen of Clarity"] and DruidBuffSettings["Omen of Clarity"].show then
-        if IsValidBuffTarget("player") and not HasBuff("player", "Omen of Clarity") then
-            if addonTable.KNOWN_RANKS["Omen of Clarity"] and addonTable.KNOWN_RANKS["Omen of Clarity"][1] then
-                 return "Omen of Clarity", nil, "player", "Interface\\Icons\\Spell_Nature_CrystalBall"
+        
+        if DruidBuffSettings["Omen of Clarity"] and DruidBuffSettings["Omen of Clarity"].show then
+            if IsValidBuffTarget("player") and not HasBuff("player", "Omen of Clarity") then
+                if addonTable.KNOWN_RANKS["Omen of Clarity"] and addonTable.KNOWN_RANKS["Omen of Clarity"][1] then
+                     return "Omen of Clarity", nil, "player", "Interface\\Icons\\Spell_Nature_CrystalBall"
+                end
             end
         end
+        return nil, nil, nil, nil
     end
 
-    return nil, nil, nil, nil
+    local spell, rank, targetUnit, icon = checkSpells(true)
+    if spell then return spell, rank, targetUnit, icon end
+
+    return checkSpells(false)
 end
 
 local function UpdateSmartBuffButton()
