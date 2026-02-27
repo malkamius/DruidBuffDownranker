@@ -46,12 +46,25 @@ local function IsValidBuffTarget(unit)
 end
 
 local function HasBuff(unit, buffName)
+    local thresholdPct = (DruidBuffSettings and DruidBuffSettings.rebuffThreshold) or 0
     local i = 1
     while true do
-        local name = UnitBuff(unit, i)
+        local name, _, _, _, duration, expirationTime = UnitBuff(unit, i)
         if not name then break end
-        if name == buffName then return true end
-        if buffName == "Mark of the Wild" and name == "Gift of the Wild" then return true end
+        
+        local isMatch = (name == buffName) or (buffName == "Mark of the Wild" and name == "Gift of the Wild")
+        
+        if isMatch then
+            -- If the buff has an expiration time and duration > 0, check against the percentage threshold
+            if expirationTime and expirationTime > 0 and duration and duration > 0 then
+                local timeLeft = expirationTime - GetTime()
+                local thresholdSeconds = (duration * thresholdPct) / 100
+                if timeLeft <= thresholdSeconds then
+                    return false -- Treat as not having the buff (needs rebuff)
+                end
+            end
+            return true
+        end
         i = i + 1
     end
     return false
@@ -102,6 +115,16 @@ local function InRange(spellName, unit)
     return inRange == 1
 end
 
+local function IsTank(unit)
+    if UnitGroupRolesAssigned and UnitGroupRolesAssigned(unit) == "TANK" then
+        return true
+    end
+    if GetPartyAssignment and GetPartyAssignment("MAINTANK", unit) then
+        return true
+    end
+    return false
+end
+
 local function FindMissingBuff()
     if not DruidBuffSettings then return nil, nil, nil, nil end
     local units = GetGroupUnits()
@@ -121,12 +144,16 @@ local function FindMissingBuff()
         end
 
         if DruidBuffSettings["Thorns"] and DruidBuffSettings["Thorns"].smartCast ~= false then
+            local tanksOnly = DruidBuffSettings["Thorns"].tanksOnly
+            local inGroup = (IsInGroup and IsInGroup()) or (GetNumPartyMembers and GetNumPartyMembers() > 0) or (GetNumRaidMembers and GetNumRaidMembers() > 0)
             for _, unit in ipairs(units) do
                 if IsValidBuffTarget(unit) and not HasBuff(unit, "Thorns") then
-                    if not requireRange or InRange("Thorns", unit) then
-                        local rank = GetAppropriateRank("Thorns", unit)
-                        if rank then
-                            return "Thorns", rank, unit, "Interface\\Icons\\Spell_Nature_Thorns"
+                    if not tanksOnly or not inGroup or IsTank(unit) then
+                        if not requireRange or InRange("Thorns", unit) then
+                            local rank = GetAppropriateRank("Thorns", unit)
+                            if rank then
+                                return "Thorns", rank, unit, "Interface\\Icons\\Spell_Nature_Thorns"
+                            end
                         end
                     end
                 end

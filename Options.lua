@@ -10,14 +10,21 @@ frame:SetScript("OnEvent", function(self, event, arg1)
             ["Thorns"] = { mouseover = true, show = true, smartCast = true },
             ["Omen of Clarity"] = { show = true, smartCast = true },
             showActionBar = true,
-            showSmartActionBar = true
+            showSmartActionBar = true,
+            rebuffThreshold = 10
         }
         -- Ensure backwards compatibility
         if DruidBuffSettings then
+            if DruidBuffSettings.rebuffThreshold == nil then
+                DruidBuffSettings.rebuffThreshold = 10
+            end
             for _, spell in ipairs({"Mark of the Wild", "Thorns", "Omen of Clarity"}) do
                 if DruidBuffSettings[spell] and DruidBuffSettings[spell].smartCast == nil then
                     DruidBuffSettings[spell].smartCast = true
                 end
+            end
+            if DruidBuffSettings["Thorns"] and DruidBuffSettings["Thorns"].tanksOnly == nil then
+                DruidBuffSettings["Thorns"].tanksOnly = false
             end
         end
         self:UnregisterEvent("ADDON_LOADED")
@@ -55,7 +62,7 @@ local title = optionsFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge
 title:SetPoint("TOPLEFT", 16, -16)
 title:SetText("Druid Buff Downranker Settings")
 
-local function CreateToggle(spellName, yOffset, hasMouseover)
+local function CreateToggle(spellName, yOffset, hasMouseover, hasTanksOnly)
     local cbShow = CreateFrame("CheckButton", "DruidBuffCheck_Show_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
     cbShow:SetPoint("TOPLEFT", 16, yOffset)
     _G[cbShow:GetName().."Text"]:SetText("Show "..spellName)
@@ -103,11 +110,27 @@ local function CreateToggle(spellName, yOffset, hasMouseover)
             end
         end)
     end
+
+    if hasTanksOnly then
+        local cbTanks = CreateFrame("CheckButton", "DruidBuffCheck_Tanks_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+        cbTanks:SetPoint("TOPLEFT", 450, yOffset)
+        _G[cbTanks:GetName().."Text"]:SetText("Tanks Only")
+        
+        cbTanks:SetScript("OnShow", function(self)
+            self:SetChecked(DruidBuffSettings and DruidBuffSettings[spellName].tanksOnly or false)
+        end)
+        
+        cbTanks:SetScript("OnClick", function(self)
+            if DruidBuffSettings then
+                DruidBuffSettings[spellName].tanksOnly = self:GetChecked()
+            end
+        end)
+    end
 end
 
-CreateToggle("Mark of the Wild", -50, true)
-CreateToggle("Thorns", -80, true)
-CreateToggle("Omen of Clarity", -110, false)
+CreateToggle("Mark of the Wild", -50, true, false)
+CreateToggle("Thorns", -80, true, true)
+CreateToggle("Omen of Clarity", -110, false, false)
 
 local showBarToggle = CreateFrame("CheckButton", "DruidBuffCheck_ShowActionBar", optionsFrame, "InterfaceOptionsCheckButtonTemplate")
 showBarToggle:SetPoint("TOPLEFT", 16, -150)
@@ -136,6 +159,51 @@ showSmartBarToggle:SetScript("OnClick", function(self)
     if DruidBuffSettings then
         DruidBuffSettings.showSmartActionBar = self:GetChecked()
         if addonTable.UpdateSmartBarVisibility then addonTable.UpdateSmartBarVisibility() end
+    end
+end)
+
+local slider = CreateFrame("Slider", "DruidBuffRebuffSlider", optionsFrame, "OptionsSliderTemplate")
+slider:SetPoint("TOPLEFT", 24, -230)
+slider:SetWidth(180)
+slider:SetMinMaxValues(0, 100) -- 0% to 100%
+slider:SetValueStep(5)
+slider:SetObeyStepOnDrag(true)
+
+-- Add a fill texture for visual feedback
+local sliderFill = slider:CreateTexture(nil, "ARTWORK")
+sliderFill:SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
+sliderFill:SetVertexColor(0, 1, 0, 0.5) -- Semi-transparent green
+sliderFill:SetPoint("TOPLEFT", slider, "TOPLEFT", 4, -4)
+sliderFill:SetPoint("BOTTOMLEFT", slider, "BOTTOMLEFT", 4, 4)
+
+_G[slider:GetName() .. "Low"]:SetText("0%")
+_G[slider:GetName() .. "High"]:SetText("100%")
+
+local function UpdateSliderText(value)
+    _G[slider:GetName() .. "Text"]:SetText(string.format("Rebuff Threshold: %d%%", value))
+    
+    local min, max = slider:GetMinMaxValues()
+    local percentage = value / (max - min)
+    if percentage > 0 then
+        -- The slider background width minus some padding (approx 8 pixels)
+        sliderFill:SetWidth((slider:GetWidth() - 8) * percentage)
+        sliderFill:Show()
+    else
+        sliderFill:Hide()
+    end
+end
+
+slider:SetScript("OnShow", function(self)
+    local val = DruidBuffSettings and DruidBuffSettings.rebuffThreshold or 10
+    self:SetValue(val)
+    UpdateSliderText(val)
+end)
+
+slider:SetScript("OnValueChanged", function(self, value)
+    if not self:IsVisible() then return end
+    if DruidBuffSettings then
+        DruidBuffSettings.rebuffThreshold = value
+        UpdateSliderText(value)
     end
 end)
 
