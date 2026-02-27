@@ -125,6 +125,13 @@ local function IsTank(unit)
     return false
 end
 
+local function IsGroupMember(unit)
+    if unit == "player" then return true end
+    if string.match(unit, "^party%d+$") then return true end
+    if string.match(unit, "^raid%d+$") then return true end
+    return false
+end
+
 local function FindMissingBuff()
     if not DruidBuffSettings then return nil, nil, nil, nil end
     local units = GetGroupUnits()
@@ -148,7 +155,7 @@ local function FindMissingBuff()
             local inGroup = (IsInGroup and IsInGroup()) or (GetNumPartyMembers and GetNumPartyMembers() > 0) or (GetNumRaidMembers and GetNumRaidMembers() > 0)
             for _, unit in ipairs(units) do
                 if IsValidBuffTarget(unit) and not HasBuff(unit, "Thorns") then
-                    if not tanksOnly or not inGroup or IsTank(unit) then
+                    if not tanksOnly or not inGroup or not IsGroupMember(unit) or IsTank(unit) then
                         if not requireRange or InRange("Thorns", unit) then
                             local rank = GetAppropriateRank("Thorns", unit)
                             if rank then
