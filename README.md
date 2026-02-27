@@ -10,6 +10,8 @@
 -   **Class Detection**: The entire addon and Action Bar automatically hides itself on characters that are not Druids.
 -   **Draggable Interface**: A compact UI bar that can be moved anywhere on your screen.
 -   **Mouseover Support**: Optionally cast buffs on your mouseover target instead of your current target.
+-   **Tanks-Only Thorns**: An option to only cast Thorns on group members recognized as tanks (Main Tanks or assigned Tank role).
+-   **Configurable Rebuff Threshold**: A slider to customize how early (as a percentage of total duration) the Smart Buff Bar should consider a buff as "missing" so you can easily maintain maximum uptime before buffs expire.
 -   **Full Keybinding Support**: Bind your smart-cast macros directly through the WoW Keybindings menu.
 -   **Smart Buff Party Assist**: A dynamic, draggable one-button bar that auto-targets group members who need *Mark of the Wild* or *Thorns* and casts the appropriate rank completely automatically out of combat.
 
@@ -49,6 +51,8 @@ Settings can be toggled through the standard interface options, and are saved gl
     -   Show/Hide the Smart Buff Bar.
     -   Show/Hide individual buttons for *Mark of the Wild*, *Thorns*, and *Omen of Clarity*. 
     -   Enable/Disable Mouseover casting for *Mark of the Wild* and *Thorns*.
+    -   Enable/Disable "Tanks Only" filtering for *Thorns* in the Smart Buff Bar.
+    -   Adjust the Rebuff Threshold slider to determine when buffs should be reapplied before expiration (0% to 100%).
 
 ## Installation
 
