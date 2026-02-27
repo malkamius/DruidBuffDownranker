@@ -5,4 +5,6 @@
 	</Binding>
 	<Binding name="CLICK SmartOmen:LeftButton" category="Druid Buff Downranker">
 	</Binding>
+	<Binding name="CLICK SmartBuffAutoBtn:LeftButton" category="Druid Buff Downranker">
+	</Binding>
 </Bindings>

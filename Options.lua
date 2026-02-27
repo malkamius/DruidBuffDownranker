@@ -6,12 +6,20 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, arg1)
     if arg1 == addonName then
         DruidBuffSettings = DruidBuffSettings or {
-            ["Mark of the Wild"] = { mouseover = true, show = true },
-            ["Thorns"] = { mouseover = true, show = true },
-            ["Omen of Clarity"] = { show = true },
+            ["Mark of the Wild"] = { mouseover = true, show = true, smartCast = true },
+            ["Thorns"] = { mouseover = true, show = true, smartCast = true },
+            ["Omen of Clarity"] = { show = true, smartCast = true },
             showActionBar = true,
             showSmartActionBar = true
         }
+        -- Ensure backwards compatibility
+        if DruidBuffSettings then
+            for _, spell in ipairs({"Mark of the Wild", "Thorns", "Omen of Clarity"}) do
+                if DruidBuffSettings[spell] and DruidBuffSettings[spell].smartCast == nil then
+                    DruidBuffSettings[spell].smartCast = true
+                end
+            end
+        end
         self:UnregisterEvent("ADDON_LOADED")
         -- Trigger initial layout renders if they are loaded
         if addonTable.UpdateActionBarLayout then addonTable.UpdateActionBarLayout() end
@@ -63,9 +71,26 @@ local function CreateToggle(spellName, yOffset, hasMouseover)
         end
     end)
     
+    local cbSmart = CreateFrame("CheckButton", "DruidBuffCheck_Smart_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+    cbSmart:SetPoint("TOPLEFT", 180, yOffset)
+    _G[cbSmart:GetName().."Text"]:SetText("Smart Cast")
+    
+    cbSmart:SetScript("OnShow", function(self)
+        local val = DruidBuffSettings and DruidBuffSettings[spellName].smartCast
+        if val == nil then val = true end
+        self:SetChecked(val)
+    end)
+    
+    cbSmart:SetScript("OnClick", function(self)
+        if DruidBuffSettings then
+            DruidBuffSettings[spellName].smartCast = self:GetChecked()
+            if addonTable.UpdateSmartBarVisibility then addonTable.UpdateSmartBarVisibility() end
+        end
+    end)
+    
     if hasMouseover then
         local cbMouse = CreateFrame("CheckButton", "DruidBuffCheck_Mouse_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
-        cbMouse:SetPoint("TOPLEFT", 180, yOffset)
+        cbMouse:SetPoint("TOPLEFT", 300, yOffset)
         _G[cbMouse:GetName().."Text"]:SetText("Enable Mouseover")
         
         cbMouse:SetScript("OnShow", function(self)

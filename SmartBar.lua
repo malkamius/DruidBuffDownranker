@@ -107,7 +107,7 @@ local function FindMissingBuff()
     local units = GetGroupUnits()
 
     local function checkSpells(requireRange)
-        if DruidBuffSettings["Mark of the Wild"] and DruidBuffSettings["Mark of the Wild"].show then
+        if DruidBuffSettings["Mark of the Wild"] and DruidBuffSettings["Mark of the Wild"].smartCast ~= false then
             for _, unit in ipairs(units) do
                 if IsValidBuffTarget(unit) and not HasBuff(unit, "Mark of the Wild") then
                     if not requireRange or InRange("Mark of the Wild", unit) then
@@ -120,7 +120,7 @@ local function FindMissingBuff()
             end
         end
 
-        if DruidBuffSettings["Thorns"] and DruidBuffSettings["Thorns"].show then
+        if DruidBuffSettings["Thorns"] and DruidBuffSettings["Thorns"].smartCast ~= false then
             for _, unit in ipairs(units) do
                 if IsValidBuffTarget(unit) and not HasBuff(unit, "Thorns") then
                     if not requireRange or InRange("Thorns", unit) then
@@ -133,7 +133,7 @@ local function FindMissingBuff()
             end
         end
         
-        if DruidBuffSettings["Omen of Clarity"] and DruidBuffSettings["Omen of Clarity"].show then
+        if DruidBuffSettings["Omen of Clarity"] and DruidBuffSettings["Omen of Clarity"].smartCast ~= false then
             if IsValidBuffTarget("player") and not HasBuff("player", "Omen of Clarity") then
                 if addonTable.KNOWN_RANKS["Omen of Clarity"] and addonTable.KNOWN_RANKS["Omen of Clarity"][1] then
                      return "Omen of Clarity", nil, "player", "Interface\\Icons\\Spell_Nature_CrystalBall"
