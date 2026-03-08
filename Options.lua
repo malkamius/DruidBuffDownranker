@@ -18,7 +18,7 @@ frame:SetScript("OnEvent", function(self, event, arg1)
             if DruidBuffSettings.rebuffThreshold == nil then
                 DruidBuffSettings.rebuffThreshold = 10
             end
-            for _, spell in ipairs({"Mark of the Wild", "Thorns", "Omen of Clarity"}) do
+            for _, spell in ipairs({ "Mark of the Wild", "Thorns", "Omen of Clarity" }) do
                 if DruidBuffSettings[spell] and DruidBuffSettings[spell].smartCast == nil then
                     DruidBuffSettings[spell].smartCast = true
                 end
@@ -63,47 +63,50 @@ title:SetPoint("TOPLEFT", 16, -16)
 title:SetText("Druid Buff Downranker Settings")
 
 local function CreateToggle(spellName, yOffset, hasMouseover, hasTanksOnly)
-    local cbShow = CreateFrame("CheckButton", "DruidBuffCheck_Show_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+    local cbShow = CreateFrame("CheckButton", "DruidBuffCheck_Show_" .. spellName:gsub("%s+", ""), optionsFrame,
+        "InterfaceOptionsCheckButtonTemplate")
     cbShow:SetPoint("TOPLEFT", 16, yOffset)
-    _G[cbShow:GetName().."Text"]:SetText("Show "..spellName)
-    
+    _G[cbShow:GetName() .. "Text"]:SetText("Show " .. spellName)
+
     cbShow:SetScript("OnShow", function(self)
         self:SetChecked(DruidBuffSettings and DruidBuffSettings[spellName].show or false)
     end)
-    
+
     cbShow:SetScript("OnClick", function(self)
         if DruidBuffSettings then
             DruidBuffSettings[spellName].show = self:GetChecked()
             if addonTable.UpdateActionBarLayout then addonTable.UpdateActionBarLayout() end
         end
     end)
-    
-    local cbSmart = CreateFrame("CheckButton", "DruidBuffCheck_Smart_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+
+    local cbSmart = CreateFrame("CheckButton", "DruidBuffCheck_Smart_" .. spellName:gsub("%s+", ""), optionsFrame,
+        "InterfaceOptionsCheckButtonTemplate")
     cbSmart:SetPoint("TOPLEFT", 180, yOffset)
-    _G[cbSmart:GetName().."Text"]:SetText("Smart Cast")
-    
+    _G[cbSmart:GetName() .. "Text"]:SetText("Smart Cast")
+
     cbSmart:SetScript("OnShow", function(self)
         local val = DruidBuffSettings and DruidBuffSettings[spellName].smartCast
         if val == nil then val = true end
         self:SetChecked(val)
     end)
-    
+
     cbSmart:SetScript("OnClick", function(self)
         if DruidBuffSettings then
             DruidBuffSettings[spellName].smartCast = self:GetChecked()
             if addonTable.UpdateSmartBarVisibility then addonTable.UpdateSmartBarVisibility() end
         end
     end)
-    
+
     if hasMouseover then
-        local cbMouse = CreateFrame("CheckButton", "DruidBuffCheck_Mouse_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+        local cbMouse = CreateFrame("CheckButton", "DruidBuffCheck_Mouse_" .. spellName:gsub("%s+", ""), optionsFrame,
+            "InterfaceOptionsCheckButtonTemplate")
         cbMouse:SetPoint("TOPLEFT", 300, yOffset)
-        _G[cbMouse:GetName().."Text"]:SetText("Enable Mouseover")
-        
+        _G[cbMouse:GetName() .. "Text"]:SetText("Enable Mouseover")
+
         cbMouse:SetScript("OnShow", function(self)
             self:SetChecked(DruidBuffSettings and DruidBuffSettings[spellName].mouseover or false)
         end)
-        
+
         cbMouse:SetScript("OnClick", function(self)
             if DruidBuffSettings then
                 DruidBuffSettings[spellName].mouseover = self:GetChecked()
@@ -112,14 +115,15 @@ local function CreateToggle(spellName, yOffset, hasMouseover, hasTanksOnly)
     end
 
     if hasTanksOnly then
-        local cbTanks = CreateFrame("CheckButton", "DruidBuffCheck_Tanks_"..spellName:gsub("%s+", ""), optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+        local cbTanks = CreateFrame("CheckButton", "DruidBuffCheck_Tanks_" .. spellName:gsub("%s+", ""), optionsFrame,
+            "InterfaceOptionsCheckButtonTemplate")
         cbTanks:SetPoint("TOPLEFT", 450, yOffset)
-        _G[cbTanks:GetName().."Text"]:SetText("Tanks Only")
-        
+        _G[cbTanks:GetName() .. "Text"]:SetText("Tanks Only")
+
         cbTanks:SetScript("OnShow", function(self)
             self:SetChecked(DruidBuffSettings and DruidBuffSettings[spellName].tanksOnly or false)
         end)
-        
+
         cbTanks:SetScript("OnClick", function(self)
             if DruidBuffSettings then
                 DruidBuffSettings[spellName].tanksOnly = self:GetChecked()
@@ -132,26 +136,32 @@ CreateToggle("Mark of the Wild", -50, true, false)
 CreateToggle("Thorns", -80, true, true)
 CreateToggle("Omen of Clarity", -110, false, false)
 
-local showBarToggle = CreateFrame("CheckButton", "DruidBuffCheck_ShowActionBar", optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+local showBarToggle = CreateFrame("CheckButton", "DruidBuffCheck_ShowActionBar", optionsFrame,
+    "InterfaceOptionsCheckButtonTemplate")
 showBarToggle:SetPoint("TOPLEFT", 16, -150)
-_G[showBarToggle:GetName().."Text"]:SetText("Show Action Bar")
+_G[showBarToggle:GetName() .. "Text"]:SetText("Show Action Bar")
 showBarToggle:SetScript("OnShow", function(self)
     self:SetChecked(DruidBuffSettings and DruidBuffSettings.showActionBar or false)
 end)
 showBarToggle:SetScript("OnClick", function(self)
     if DruidBuffSettings then
         DruidBuffSettings.showActionBar = self:GetChecked()
+
+        ---@type Frame
+        ---@diagnostic disable-next-line: undefined-global
+        local bar = DruidBuffBar
         if self:GetChecked() then
-            if DruidBuffBar then DruidBuffBar:Show() end
+            if bar then bar:Show() end
         else
-            if DruidBuffBar then DruidBuffBar:Hide() end
+            if bar then bar:Hide() end
         end
     end
 end)
 
-local showSmartBarToggle = CreateFrame("CheckButton", "DruidBuffCheck_ShowSmartActionBar", optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+local showSmartBarToggle = CreateFrame("CheckButton", "DruidBuffCheck_ShowSmartActionBar", optionsFrame,
+    "InterfaceOptionsCheckButtonTemplate")
 showSmartBarToggle:SetPoint("TOPLEFT", 16, -180)
-_G[showSmartBarToggle:GetName().."Text"]:SetText("Show Smart Buff Bar")
+_G[showSmartBarToggle:GetName() .. "Text"]:SetText("Show Smart Buff Bar")
 showSmartBarToggle:SetScript("OnShow", function(self)
     self:SetChecked(DruidBuffSettings and DruidBuffSettings.showSmartActionBar or false)
 end)
@@ -181,7 +191,7 @@ _G[slider:GetName() .. "High"]:SetText("100%")
 
 local function UpdateSliderText(value)
     _G[slider:GetName() .. "Text"]:SetText(string.format("Rebuff Threshold: %d%%", value))
-    
+
     local min, max = slider:GetMinMaxValues()
     local percentage = value / (max - min)
     if percentage > 0 then
