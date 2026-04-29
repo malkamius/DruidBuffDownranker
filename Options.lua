@@ -18,7 +18,7 @@ frame:SetScript("OnEvent", function(self, event, arg1)
             if DruidBuffSettings.rebuffThreshold == nil then
                 DruidBuffSettings.rebuffThreshold = 10
             end
-            for _, spell in ipairs({ "Mark of the Wild", "Thorns", "Omen of Clarity" }) do
+            for _, spell in ipairs({ "Mark of the Wild", "Omen of Clarity", "Thorns" }) do
                 if DruidBuffSettings[spell] and DruidBuffSettings[spell].smartCast == nil then
                     DruidBuffSettings[spell].smartCast = true
                 end
@@ -133,8 +133,8 @@ local function CreateToggle(spellName, yOffset, hasMouseover, hasTanksOnly)
 end
 
 CreateToggle("Mark of the Wild", -50, true, false)
-CreateToggle("Thorns", -80, true, true)
-CreateToggle("Omen of Clarity", -110, false, false)
+CreateToggle("Omen of Clarity", -80, false, false)
+CreateToggle("Thorns", -110, true, true)
 
 local showBarToggle = CreateFrame("CheckButton", "DruidBuffCheck_ShowActionBar", optionsFrame,
     "InterfaceOptionsCheckButtonTemplate")

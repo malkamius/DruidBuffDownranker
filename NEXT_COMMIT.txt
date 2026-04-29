@@ -1,0 +1,9 @@
+feat(logic): prioritize Omen of Clarity over Thorns
+
+The user requested that Omen of Clarity be prioritized over Thorns.
+This ensures that the Smart Bar suggests Omen of Clarity first if both
+are missing, and that the UI layout reflects this new priority.
+
+- Move Omen of Clarity check before Thorns in Smart Bar logic.
+- Reorder Action Bar buttons to place Omen before Thorns.
+- Update Options menu to show Omen toggles above Thorns.

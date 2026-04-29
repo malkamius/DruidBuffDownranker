@@ -14,6 +14,7 @@
 -   **Configurable Rebuff Threshold**: A slider to customize how early (as a percentage of total duration) the Smart Buff Bar should consider a buff as "missing" so you can easily maintain maximum uptime before buffs expire.
 -   **Full Keybinding Support**: Bind your smart-cast macros directly through the WoW Keybindings menu.
 -   **Smart Buff Party Assist**: A dynamic, draggable one-button bar that auto-targets group members who need *Mark of the Wild* or *Thorns* and casts the appropriate rank completely automatically out of combat.
+-   **Intelligent Buff Priority**: Automatically prioritizes critical personal buffs like *Omen of Clarity* before suggesting group buffs like *Thorns* on the Smart Buff Bar.
 
 ## Usage
 

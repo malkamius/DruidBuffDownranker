@@ -158,8 +158,8 @@ function addonTable.UpdateActionBarLayout()
     end
     
     LayoutButton(motwBtn)
-    LayoutButton(thornsBtn)
     LayoutButton(omenBtn)
+    LayoutButton(thornsBtn)
     
     if visibleButtons > 0 then
         bar:SetSize((visibleButtons * 45) + 20, 60)

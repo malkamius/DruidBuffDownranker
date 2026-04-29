@@ -246,6 +246,14 @@ local function FindMissingBuff()
             end
         end
 
+        if DruidBuffSettings["Omen of Clarity"] and DruidBuffSettings["Omen of Clarity"].smartCast ~= false then
+            if IsValidBuffTarget("player") and not HasBuff("player", "Omen of Clarity") then
+                if addonTable.KNOWN_RANKS["Omen of Clarity"] and addonTable.KNOWN_RANKS["Omen of Clarity"][1] then
+                    return "Omen of Clarity", nil, "player", "Interface\\Icons\\Spell_Nature_CrystalBall"
+                end
+            end
+        end
+
         if DruidBuffSettings["Thorns"] and DruidBuffSettings["Thorns"].smartCast ~= false then
             local tanksOnly = DruidBuffSettings["Thorns"].tanksOnly
             local inGroup = IsInGroup and IsInGroup()
@@ -259,14 +267,6 @@ local function FindMissingBuff()
                             end
                         end
                     end
-                end
-            end
-        end
-
-        if DruidBuffSettings["Omen of Clarity"] and DruidBuffSettings["Omen of Clarity"].smartCast ~= false then
-            if IsValidBuffTarget("player") and not HasBuff("player", "Omen of Clarity") then
-                if addonTable.KNOWN_RANKS["Omen of Clarity"] and addonTable.KNOWN_RANKS["Omen of Clarity"][1] then
-                    return "Omen of Clarity", nil, "player", "Interface\\Icons\\Spell_Nature_CrystalBall"
                 end
             end
         end
