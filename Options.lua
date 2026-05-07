@@ -11,7 +11,8 @@ frame:SetScript("OnEvent", function(self, event, arg1)
             ["Omen of Clarity"] = { show = true, smartCast = true },
             showActionBar = true,
             showSmartActionBar = true,
-            rebuffThreshold = 10
+            rebuffThreshold = 10,
+            pvpProtection = true
         }
         -- Ensure backwards compatibility
         if DruidBuffSettings then
@@ -25,6 +26,9 @@ frame:SetScript("OnEvent", function(self, event, arg1)
             end
             if DruidBuffSettings["Thorns"] and DruidBuffSettings["Thorns"].tanksOnly == nil then
                 DruidBuffSettings["Thorns"].tanksOnly = false
+            end
+            if DruidBuffSettings.pvpProtection == nil then
+                DruidBuffSettings.pvpProtection = true
             end
         end
         self:UnregisterEvent("ADDON_LOADED")
@@ -168,12 +172,25 @@ end)
 showSmartBarToggle:SetScript("OnClick", function(self)
     if DruidBuffSettings then
         DruidBuffSettings.showSmartActionBar = self:GetChecked()
-        if addonTable.UpdateSmartBarVisibility then addonTable.UpdateSmartBarVisibility() end
+    end
+    if addonTable.UpdateSmartBarVisibility then addonTable.UpdateSmartBarVisibility() end
+end)
+
+local pvpProtectToggle = CreateFrame("CheckButton", "DruidBuffCheck_PVPProtection", optionsFrame,
+    "InterfaceOptionsCheckButtonTemplate")
+pvpProtectToggle:SetPoint("TOPLEFT", 16, -210)
+_G[pvpProtectToggle:GetName() .. "Text"]:SetText("PvP Protection (Don't Flag)")
+pvpProtectToggle:SetScript("OnShow", function(self)
+    self:SetChecked(DruidBuffSettings and DruidBuffSettings.pvpProtection or false)
+end)
+pvpProtectToggle:SetScript("OnClick", function(self)
+    if DruidBuffSettings then
+        DruidBuffSettings.pvpProtection = self:GetChecked()
     end
 end)
 
 local slider = CreateFrame("Slider", "DruidBuffRebuffSlider", optionsFrame, "OptionsSliderTemplate")
-slider:SetPoint("TOPLEFT", 24, -230)
+slider:SetPoint("TOPLEFT", 24, -270)
 slider:SetWidth(180)
 slider:SetMinMaxValues(0, 100) -- 0% to 100%
 slider:SetValueStep(5)

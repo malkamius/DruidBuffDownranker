@@ -15,6 +15,8 @@
 -   **Full Keybinding Support**: Bind your smart-cast macros directly through the WoW Keybindings menu.
 -   **Smart Buff Party Assist**: A dynamic, draggable one-button bar that auto-targets group members who need *Mark of the Wild* or *Thorns* and casts the appropriate rank completely automatically out of combat.
 -   **Intelligent Buff Priority**: Automatically prioritizes critical personal buffs like *Omen of Clarity* before suggesting group buffs like *Thorns* on the Smart Buff Bar.
+-   **PvP Protection**: Automatically skips PvP-flagged targets to avoid accidental flagging, with a smart bypass for dungeons and raids.
+-   **Advanced Target Priority**: The Smart Buff Bar evaluates targets in a logical order: Self > Target > Mouseover > Group, ensuring you are always buffed first.
 
 ## Usage
 
@@ -53,6 +55,7 @@ Settings can be toggled through the standard interface options, and are saved gl
     -   Show/Hide individual buttons for *Mark of the Wild*, *Thorns*, and *Omen of Clarity*. 
     -   Enable/Disable Mouseover casting for *Mark of the Wild* and *Thorns*.
     -   Enable/Disable "Tanks Only" filtering for *Thorns* in the Smart Buff Bar.
+    -   Enable/Disable "PvP Protection" to avoid accidentally flagging yourself.
     -   Adjust the Rebuff Threshold slider to determine when buffs should be reapplied before expiration (0% to 100%).
 
 ## Installation

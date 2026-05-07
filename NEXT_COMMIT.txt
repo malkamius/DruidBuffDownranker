@@ -1,9 +1,8 @@
-feat(logic): prioritize Omen of Clarity over Thorns
+feat(smartbuff): add pvp protection and mouseover priority
 
-The user requested that Omen of Clarity be prioritized over Thorns.
-This ensures that the Smart Bar suggests Omen of Clarity first if both
-are missing, and that the UI layout reflects this new priority.
-
-- Move Omen of Clarity check before Thorns in Smart Bar logic.
-- Reorder Action Bar buttons to place Omen before Thorns.
-- Update Options menu to show Omen toggles above Thorns.
+- Implement `pvpProtection` setting to avoid accidental PvP flagging.
+- Targets that are PvP flagged are ignored if the player is not flagged (unless in a dungeon/raid).
+- Update `GetGroupUnits` to include `mouseover` targets with a priority of Self > Target > Mouseover.
+- Respect individual spell `mouseover` settings when evaluating mouseover targets.
+- Add "PvP Protection" toggle to the options panel and SmartBuff button right-click menu.
+- Increase SmartBuff popup menu size to accommodate the new toggle.

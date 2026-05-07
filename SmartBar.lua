@@ -32,7 +32,7 @@ smartBtn:SetAttribute("type1", "macro")
 -- --- Thorns Tank Only Popup Menu ---
 local popupMenu = CreateFrame("Frame", "SmartBuffPopupMenu", UIParent,
     BackdropTemplateMixin and "BackdropTemplate" or nil)
-popupMenu:SetSize(170, 40)
+popupMenu:SetSize(200, 70)
 popupMenu:SetBackdrop({
     bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
     edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
@@ -64,12 +64,23 @@ popupMenu:SetScript("OnHide", function()
 end)
 
 local popupCheck = CreateFrame("CheckButton", "SmartBuffPopupMenuCheck", popupMenu, "InterfaceOptionsCheckButtonTemplate")
-popupCheck:SetPoint("LEFT", 10, 0)
+popupCheck:SetPoint("TOPLEFT", 10, -5)
 _G[popupCheck:GetName() .. "Text"]:SetText("Thorns: Tanks Only")
 popupCheck:SetScript("OnClick", function(self)
     if DruidBuffSettings and DruidBuffSettings["Thorns"] then
         DruidBuffSettings["Thorns"].tanksOnly = self:GetChecked()
         local cb = _G["DruidBuffCheck_Tanks_Thorns"]
+        if cb then cb:SetChecked(self:GetChecked()) end
+    end
+end)
+
+local popupCheckPVP = CreateFrame("CheckButton", "SmartBuffPopupMenuCheckPVP", popupMenu, "InterfaceOptionsCheckButtonTemplate")
+popupCheckPVP:SetPoint("TOPLEFT", 10, -35)
+_G[popupCheckPVP:GetName() .. "Text"]:SetText("Don't Flag (PvP)")
+popupCheckPVP:SetScript("OnClick", function(self)
+    if DruidBuffSettings then
+        DruidBuffSettings.pvpProtection = self:GetChecked()
+        local cb = _G["DruidBuffCheck_PVPProtection"]
         if cb then cb:SetChecked(self:GetChecked()) end
     end
 end)
@@ -93,6 +104,7 @@ smartBtn:SetScript("PostClick", function(self, button)
         else
             popupCheck:SetChecked(DruidBuffSettings and DruidBuffSettings["Thorns"] and
                 DruidBuffSettings["Thorns"].tanksOnly or false)
+            popupCheckPVP:SetChecked(DruidBuffSettings and DruidBuffSettings.pvpProtection or false)
             popupMenu:ClearAllPoints()
 
             local cx, cy = self:GetCenter()
@@ -183,13 +195,23 @@ end
 local function GetGroupUnits()
     local units = {}
 
+    -- Priority 1: Self
+    table.insert(units, "player")
+
+    -- Priority 2: Target (if friendly player and not self)
     if UnitExists("target") and UnitIsFriend("player", "target") and UnitIsPlayer("target") then
         if not UnitIsUnit("target", "player") then
             table.insert(units, "target")
         end
     end
 
-    table.insert(units, "player")
+    -- Priority 3: Mouseover (if friendly player and not self/target)
+    if UnitExists("mouseover") and UnitIsFriend("player", "mouseover") and UnitIsPlayer("mouseover") then
+        if not UnitIsUnit("mouseover", "player") and not UnitIsUnit("mouseover", "target") then
+            table.insert(units, "mouseover")
+        end
+    end
+
     local numRaid = IsInRaid and IsInRaid() and GetNumGroupMembers() or 0
     local numParty = IsInGroup and IsInGroup() and GetNumSubgroupMembers() or 0
 
@@ -203,6 +225,24 @@ local function GetGroupUnits()
         end
     end
     return units
+end
+
+local function ShouldIgnorePVP(unit)
+    if not DruidBuffSettings or not DruidBuffSettings.pvpProtection then return false end
+    if unit == "player" then return false end
+
+    local isPVP = UnitIsPVP(unit)
+    local playerPVP = UnitIsPVP("player")
+
+    if isPVP and not playerPVP then
+        local inInstance, instanceType = IsInInstance()
+        if inInstance and (instanceType == "party" or instanceType == "raid") then
+            return false -- Safe to buff in dungeons/raids
+        end
+        return true -- Might flag us, ignore
+    end
+
+    return false
 end
 
 local function InRange(spellName, unit)
@@ -235,11 +275,14 @@ local function FindMissingBuff()
     local function checkSpells(requireRange)
         if DruidBuffSettings["Mark of the Wild"] and DruidBuffSettings["Mark of the Wild"].smartCast ~= false then
             for _, unit in ipairs(units) do
-                if IsValidBuffTarget(unit) and not HasBuff(unit, "Mark of the Wild") then
-                    if not requireRange or InRange("Mark of the Wild", unit) then
-                        local rank = GetAppropriateRank("Mark of the Wild", unit)
-                        if rank then
-                            return "Mark of the Wild", rank, unit, "Interface\\Icons\\Spell_Nature_Regeneration"
+                if IsValidBuffTarget(unit) and not HasBuff(unit, "Mark of the Wild") and not ShouldIgnorePVP(unit) then
+                    local setting = DruidBuffSettings["Mark of the Wild"]
+                    if unit ~= "mouseover" or setting.mouseover then
+                        if not requireRange or InRange("Mark of the Wild", unit) then
+                            local rank = GetAppropriateRank("Mark of the Wild", unit)
+                            if rank then
+                                return "Mark of the Wild", rank, unit, "Interface\\Icons\\Spell_Nature_Regeneration"
+                            end
                         end
                     end
                 end
@@ -258,12 +301,15 @@ local function FindMissingBuff()
             local tanksOnly = DruidBuffSettings["Thorns"].tanksOnly
             local inGroup = IsInGroup and IsInGroup()
             for _, unit in ipairs(units) do
-                if IsValidBuffTarget(unit) and not HasBuff(unit, "Thorns") then
-                    if not tanksOnly or not inGroup or not IsGroupMember(unit) or IsTank(unit) then
-                        if not requireRange or InRange("Thorns", unit) then
-                            local rank = GetAppropriateRank("Thorns", unit)
-                            if rank then
-                                return "Thorns", rank, unit, "Interface\\Icons\\Spell_Nature_Thorns"
+                if IsValidBuffTarget(unit) and not HasBuff(unit, "Thorns") and not ShouldIgnorePVP(unit) then
+                    local setting = DruidBuffSettings["Thorns"]
+                    if unit ~= "mouseover" or setting.mouseover then
+                        if not tanksOnly or not inGroup or not IsGroupMember(unit) or IsTank(unit) then
+                            if not requireRange or InRange("Thorns", unit) then
+                                local rank = GetAppropriateRank("Thorns", unit)
+                                if rank then
+                                    return "Thorns", rank, unit, "Interface\\Icons\\Spell_Nature_Thorns"
+                                end
                             end
                         end
                     end
