@@ -1,8 +1,9 @@
-feat(smartbuff): add pvp protection and mouseover priority
+fix(core): implement combat protection for secure frames
 
-- Implement `pvpProtection` setting to avoid accidental PvP flagging.
-- Targets that are PvP flagged are ignored if the player is not flagged (unless in a dungeon/raid).
-- Update `GetGroupUnits` to include `mouseover` targets with a priority of Self > Target > Mouseover.
-- Respect individual spell `mouseover` settings when evaluating mouseover targets.
-- Add "PvP Protection" toggle to the options panel and SmartBuff button right-click menu.
-- Increase SmartBuff popup menu size to accommodate the new toggle.
+- Add InCombatLockdown checks before calling Hide() or Show() on frames
+  containing secure buttons.
+- Implement PLAYER_REGEN_ENABLED event handling to queue layout updates
+  that are triggered during combat.
+- Prevent redundant Hide() calls on non-Druid characters.
+- Secure the "Show Action Bar" toggle in the options panel.
+- Update post-commit hook to include commit history export.

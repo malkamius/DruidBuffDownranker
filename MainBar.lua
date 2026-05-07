@@ -129,9 +129,14 @@ local omenBtn = CreateBuffButton("SmartOmen", "Omen of Clarity", "Interface\\Ico
 function addonTable.UpdateActionBarLayout()
     if not DruidBuffSettings then return end
 
+    if InCombatLockdown() then
+        bar:RegisterEvent("PLAYER_REGEN_ENABLED")
+        return
+    end
+
     local _, playerClass = UnitClass("player")
     if playerClass ~= "DRUID" then
-        if bar then bar:Hide() end
+        if bar:IsShown() then bar:Hide() end
         return
     end
 
@@ -164,11 +169,18 @@ function addonTable.UpdateActionBarLayout()
     if visibleButtons > 0 then
         bar:SetSize((visibleButtons * 45) + 20, 60)
         if DruidBuffSettings.showActionBar then
-            bar:Show()
+            if not bar:IsShown() then bar:Show() end
         else
-            bar:Hide()
+            if bar:IsShown() then bar:Hide() end
         end
     else
-        bar:Hide()
+        if bar:IsShown() then bar:Hide() end
     end
 end
+
+bar:SetScript("OnEvent", function(self, event)
+    if event == "PLAYER_REGEN_ENABLED" then
+        addonTable.UpdateActionBarLayout()
+        self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    end
+end)

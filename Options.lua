@@ -151,13 +151,17 @@ showBarToggle:SetScript("OnClick", function(self)
     if DruidBuffSettings then
         DruidBuffSettings.showActionBar = self:GetChecked()
 
-        ---@type Frame
-        ---@diagnostic disable-next-line: undefined-global
+        if InCombatLockdown() then
+            print("|cFFFFFF00[DruidBuff]|r Action Bar visibility will update after combat.")
+            if DruidBuffBar then DruidBuffBar:RegisterEvent("PLAYER_REGEN_ENABLED") end
+            return
+        end
+
         local bar = DruidBuffBar
         if self:GetChecked() then
-            if bar then bar:Show() end
+            if bar and not bar:IsShown() then bar:Show() end
         else
-            if bar then bar:Hide() end
+            if bar and bar:IsShown() then bar:Hide() end
         end
     end
 end)

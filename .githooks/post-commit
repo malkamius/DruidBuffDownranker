@@ -8,6 +8,9 @@
 
 cd "$(git rev-parse --show-toplevel)"
 
+echo "[post-commit] Exporting commit messages..."
+powershell.exe -ExecutionPolicy Bypass -File export_commits.ps1
+
 echo "[post-commit] Deploying addon to WoW AddOns folder..."
 powershell.exe -ExecutionPolicy Bypass -File deploy.ps1
 

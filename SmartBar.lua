@@ -385,16 +385,26 @@ end)
 function addonTable.UpdateSmartBarVisibility()
     if not DruidBuffSettings then return end
 
+    if InCombatLockdown() then
+        smartBar:RegisterEvent("PLAYER_REGEN_ENABLED")
+        return
+    end
+
     local _, playerClass = UnitClass("player")
     if playerClass ~= "DRUID" or not DruidBuffSettings.showSmartActionBar then
-        if smartBar then smartBar:Hide() end
+        if smartBar:IsShown() then smartBar:Hide() end
     else
-        if smartBar then smartBar:Show() end
-        if not InCombatLockdown() then
-            UpdateSmartBuffButton()
-        end
+        if not smartBar:IsShown() then smartBar:Show() end
+        UpdateSmartBuffButton()
     end
 end
+
+smartBar:SetScript("OnEvent", function(self, event)
+    if event == "PLAYER_REGEN_ENABLED" then
+        addonTable.UpdateSmartBarVisibility()
+        self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    end
+end)
 
 local scannerFrame = CreateFrame("Frame")
 scannerFrame:RegisterEvent("UNIT_AURA")

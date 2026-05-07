@@ -17,6 +17,7 @@
 -   **Intelligent Buff Priority**: Automatically prioritizes critical personal buffs like *Omen of Clarity* before suggesting group buffs like *Thorns* on the Smart Buff Bar.
 -   **PvP Protection**: Automatically skips PvP-flagged targets to avoid accidental flagging, with a smart bypass for dungeons and raids.
 -   **Advanced Target Priority**: The Smart Buff Bar evaluates targets in a logical order: Self > Target > Mouseover > Group, ensuring you are always buffed first.
+-   **Combat Protected UI**: The interface is fully combat-aware and handles visibility changes safely, queueing layout updates until you leave combat to avoid game errors.
 
 ## Usage
 
