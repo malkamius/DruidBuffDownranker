@@ -1,1 +1,1 @@
-chore: update interface version to 11508 for classic era
+chore: support both Classic Era and TBC and bump version to 1.9.3
