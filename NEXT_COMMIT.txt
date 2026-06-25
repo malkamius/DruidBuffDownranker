@@ -1,9 +1,1 @@
-fix(core): implement combat protection for secure frames
-
-- Add InCombatLockdown checks before calling Hide() or Show() on frames
-  containing secure buttons.
-- Implement PLAYER_REGEN_ENABLED event handling to queue layout updates
-  that are triggered during combat.
-- Prevent redundant Hide() calls on non-Druid characters.
-- Secure the "Show Action Bar" toggle in the options panel.
-- Update post-commit hook to include commit history export.
+chore: update interface version to 11508 for classic era
