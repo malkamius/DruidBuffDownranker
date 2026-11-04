@@ -40,10 +40,10 @@ end)
 
 -- --- KEYBINDING LOCALIZATION ---
 _G["BINDING_HEADER_DRUIDBUFFDR_HEADER"] = "Druid Buff Downranker"
-_G["BINDING_NAME_CLICK SmartMotW:LeftButton"] = "Cast Smart MotW"
-_G["BINDING_NAME_CLICK SmartThorns:LeftButton"] = "Cast Smart Thorns"
-_G["BINDING_NAME_CLICK SmartOmen:LeftButton"] = "Cast Smart Omen"
-_G["BINDING_NAME_CLICK SmartBuffAutoBtn:LeftButton"] = "Cast Smart Auto Buff"
+_G["BINDING_NAME_CLICK SmartMotW:LeftButton"] = "DruidBuff: Cast Smart MotW"
+_G["BINDING_NAME_CLICK SmartThorns:LeftButton"] = "DruidBuff: Cast Smart Thorns"
+_G["BINDING_NAME_CLICK SmartOmen:LeftButton"] = "DruidBuff: Cast Smart Omen"
+_G["BINDING_NAME_CLICK SmartBuffAutoBtn:LeftButton"] = "DruidBuff: Cast Smart Auto Buff"
 
 -- --- OPTIONS PANEL HIERARCHY SETUP (Modern Settings API) ---
 
