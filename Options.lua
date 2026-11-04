@@ -239,4 +239,22 @@ slider:SetScript("OnValueChanged", function(self, value)
 end)
 
 -- Using RegisterCanvasLayoutSubcategory is the correct way to handle nesting in modern WoW/TBC Classic
+local openBindingsBtn = CreateFrame("Button", nil, optionsFrame, "UIPanelButtonTemplate")
+openBindingsBtn:SetSize(160, 24)
+openBindingsBtn:SetPoint("TOPLEFT", 16, -320)
+openBindingsBtn:SetText("Open Keybindings")
+openBindingsBtn:SetScript("OnClick", function()
+    if InCombatLockdown and InCombatLockdown() then return end
+    if Settings and Settings.OpenToCategory and Settings.KEYBINDINGS_CATEGORY_ID then
+        Settings.OpenToCategory(Settings.KEYBINDINGS_CATEGORY_ID)
+    elseif SettingsPanel and SettingsPanel.OpenToCategory and Settings.KEYBINDINGS_CATEGORY_ID then
+        SettingsPanel:OpenToCategory(Settings.KEYBINDINGS_CATEGORY_ID)
+    elseif KeyBindingFrame_LoadUI then
+        KeyBindingFrame_LoadUI()
+        ShowUIPanel(KeyBindingFrame)
+    elseif KeyBindingFrame then
+        ShowUIPanel(KeyBindingFrame)
+    end
+end)
+
 local subCategory = Settings.RegisterCanvasLayoutSubcategory(druidCategory, optionsFrame, "BuffDownranker")

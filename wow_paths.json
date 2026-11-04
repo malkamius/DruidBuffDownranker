@@ -1,3 +1,7 @@
 {
-  "wowAddonPath": "G:\\Battle.net\\World of Warcraft\\_anniversary_\\Interface\\AddOns"
+  "wowAddonPath": [
+    "G:\\Battle.net\\World of Warcraft\\_classic_beta_\\Interface\\AddOns",
+    "G:\\Battle.net\\World of Warcraft\\_anniversary_\\Interface\\AddOns",
+    "G:\\Battle.net\\World of Warcraft\\_forever_\\Interface\\AddOns"
+  ]
 }

@@ -1,10 +1,10 @@
 <Bindings>
-	<Binding name="CLICK SmartMotW:LeftButton" category="Druid Buff Downranker">
+	<Binding name="CLICK SmartMotW:LeftButton" header="DRUIDBUFFDR_HEADER" category="ADDONS">
 	</Binding>
-	<Binding name="CLICK SmartThorns:LeftButton" category="Druid Buff Downranker">
+	<Binding name="CLICK SmartThorns:LeftButton" category="ADDONS">
 	</Binding>
-	<Binding name="CLICK SmartOmen:LeftButton" category="Druid Buff Downranker">
+	<Binding name="CLICK SmartOmen:LeftButton" category="ADDONS">
 	</Binding>
-	<Binding name="CLICK SmartBuffAutoBtn:LeftButton" category="Druid Buff Downranker">
+	<Binding name="CLICK SmartBuffAutoBtn:LeftButton" category="ADDONS">
 	</Binding>
 </Bindings>
