@@ -32,10 +32,11 @@ local function UpdateButtonRank(btn)
     end
     
     local targetLevel = UnitLevel(unit)
+    if addonTable.IsSecretValue(targetLevel) then targetLevel = nil end
     local rankText = ""
 
     local ranks = addonTable.SPELL_DATA[spellName]
-    if spellName ~= "Omen of Clarity" and targetLevel and targetLevel > 0 then
+    if targetLevel and targetLevel > 0 then
         for _, data in ipairs(ranks) do
             -- Selection logic:
             -- 1. We must know the rank (trained)
@@ -47,7 +48,7 @@ local function UpdateButtonRank(btn)
                 end
             end
         end
-    elseif spellName == "Omen of Clarity" then
+    elseif false then
         rankText = "" -- Omen has no rank text in its spell name
         unit = "player" -- Omen is always self
     end
@@ -55,7 +56,9 @@ local function UpdateButtonRank(btn)
     local macroText = "/cast [@" .. unit .. ",exists][@player] " .. spellName .. rankText
     btn:SetAttribute("macrotext", macroText)
     btn:SetAttribute("macrotext1", macroText)
-    btn._lastDesc = spellName .. rankText .. " on " .. (UnitName(unit) or "Self")
+    local unitName = UnitName(unit)
+    if not unitName or addonTable.IsSecretValue(unitName) then unitName = "Self" end
+    btn._lastDesc = spellName .. rankText .. " on " .. unitName
 end
 
 local function CreateBuffButton(name, spellName, icon, parent, xOffset)
@@ -77,7 +80,7 @@ local function CreateBuffButton(name, spellName, icon, parent, xOffset)
     btn.cd:SetAllPoints()
 
     local function UpdateButtonCooldown()
-        local start, duration, enabled = GetSpellCooldown(btn.baseSpell)
+        local start, duration, enabled = addonTable.GetSpellCooldown(btn.baseSpell)
         if start and duration and duration > 0 and enabled == 1 then
             btn.cd:SetCooldown(start, duration)
             btn.tex:SetDesaturated(true)
@@ -123,7 +126,7 @@ end
 
 local motwBtn = CreateBuffButton("SmartMotW", "Mark of the Wild", "Interface\\Icons\\Spell_Nature_Regeneration", bar, 0)
 local thornsBtn = CreateBuffButton("SmartThorns", "Thorns", "Interface\\Icons\\Spell_Nature_Thorns", bar, 0)
-local omenBtn = CreateBuffButton("SmartOmen", "Omen of Clarity", "Interface\\Icons\\Spell_Nature_CrystalBall", bar, 0)
+-- Omen of Clarity is a passive spell; no button created.
 
 -- Global layout function so options can trigger it
 function addonTable.UpdateActionBarLayout()
@@ -163,7 +166,7 @@ function addonTable.UpdateActionBarLayout()
     end
     
     LayoutButton(motwBtn)
-    LayoutButton(omenBtn)
+    -- Omen of Clarity is passive
     LayoutButton(thornsBtn)
     
     if visibleButtons > 0 then

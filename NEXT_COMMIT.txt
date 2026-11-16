@@ -1,1 +1,15 @@
-chore: support both Classic Era and TBC and bump version to 1.9.3
+feat: support WoW Forever 1.60.1 client and APIs
+
+Upgrade DruidBuffDownranker for compatibility with World of Warcraft
+Forever (1.60.1 / Interface 16001) while maintaining backwards
+compatibility with Classic Era and TBC Anniversary clients.
+
+- Add C_UnitAuras, C_Spell, and C_SpellBook compatibility wrappers with
+  secret value guards in Core.lua for buff scanning, spell cooldowns,
+  range checks, and spellbook queries.
+- Remove Omen of Clarity button, smart cast check, keybinding, and
+  options toggle since Omen of Clarity is now a passive spell.
+- Update TOC interface versions to 11508, 11509, 16001, 20505, 20506
+  and bump version to 1.9.4.
+- Update deployment and packaging scripts to support multi-path targets
+  including the WoW Forever installation folder.

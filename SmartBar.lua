@@ -139,7 +139,7 @@ smartBtnCD:SetAllPoints()
 
 local function GetUnitTargetLevel(unit)
     local targetLevel = UnitLevel(unit)
-    if not targetLevel or targetLevel <= 0 then
+    if addonTable.IsSecretValue(targetLevel) or not targetLevel or targetLevel <= 0 then
         targetLevel = 1
     end
     return targetLevel
@@ -152,11 +152,12 @@ end
 local function HasBuff(unit, buffName)
     local thresholdPct = (DruidBuffSettings and DruidBuffSettings.rebuffThreshold) or 0
     local i = 1
-    while true do
-        local name, icon, count, debuffType, duration, expirationTime = UnitBuff(unit, i)
-        if not name then break end
+    if C_Secrets and C_Secrets.ShouldAurasBeSecret and C_Secrets.ShouldAurasBeSecret() then return false end
+    while i <= 255 do
+        local name, duration, expirationTime, isSecret = addonTable.GetUnitBuffInfo(unit, i)
+        if not name and not isSecret then break end
 
-        local isMatch = (name == buffName) or (buffName == "Mark of the Wild" and name == "Gift of the Wild")
+        local isMatch = not isSecret and name and ((name == buffName) or (buffName == "Mark of the Wild" and name == "Gift of the Wild"))
 
         if isMatch then
             -- If the buff has an expiration time and duration > 0, check against the percentage threshold
@@ -247,8 +248,9 @@ end
 
 local function InRange(spellName, unit)
     if unit == "player" then return true end
-    local inRange = IsSpellInRange(spellName, unit)
-    return inRange == 1
+    return addonTable.IsSpellInRange(spellName, unit)
+    -- (handled in Core.lua)
+    -- range check handled in Core.lua
 end
 
 local function IsTank(unit)
@@ -289,7 +291,7 @@ local function FindMissingBuff()
             end
         end
 
-        if DruidBuffSettings["Omen of Clarity"] and DruidBuffSettings["Omen of Clarity"].smartCast ~= false then
+        if false and DruidBuffSettings["Omen of Clarity"] and DruidBuffSettings["Omen of Clarity"].smartCast ~= false then
             if IsValidBuffTarget("player") and not HasBuff("player", "Omen of Clarity") then
                 if addonTable.KNOWN_RANKS["Omen of Clarity"] and addonTable.KNOWN_RANKS["Omen of Clarity"][1] then
                     return "Omen of Clarity", nil, "player", "Interface\\Icons\\Spell_Nature_CrystalBall"
@@ -349,7 +351,7 @@ local function UpdateSmartBuffButton()
             smartBtn:SetAttribute("macrotext1", macroText)
             smartBtn.tex:SetTexture(icon)
 
-            local start, duration, enabled = GetSpellCooldown(spell)
+            local start, duration, enabled = addonTable.GetSpellCooldown(spell)
             if start and duration and duration > 0 and enabled == 1 then
                 smartBtnCD:SetCooldown(start, duration)
                 smartBtn.tex:SetDesaturated(true)

@@ -1,6 +1,6 @@
 # DruidBuffDownranker
 
-**DruidBuffDownranker** is a specialized World of Warcraft addon designed for **The Burning Crusade Classic (Anniversary)**. It simplifies the process of buffing allies and yourself by automatically selecting the highest possible rank of *Mark of the Wild* and *Thorns* that the target can receive based on their level.
+**DruidBuffDownranker** is a specialized World of Warcraft addon designed for **The Burning Crusade Classic (Anniversary)**, **World of Warcraft Forever**, and **Classic Era**. It simplifies the process of buffing allies and yourself by automatically selecting the highest possible rank of *Mark of the Wild* and *Thorns* that the target can receive based on their level.
 
 ## Features
 
@@ -68,4 +68,4 @@ Settings can be toggled through the standard interface options, and are saved gl
 
 
 ---
-*Created for TBC Classic Anniversary.*
+*Created for WoW Classic Era, TBC Classic Anniversary, and WoW Forever.*

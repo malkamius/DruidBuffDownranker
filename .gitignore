@@ -1,4 +1,5 @@
 *.ps1
+*.zip
 commit_messages.txt
 .vscode
 Bugs.txt

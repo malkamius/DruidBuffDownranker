@@ -19,7 +19,7 @@ frame:SetScript("OnEvent", function(self, event, arg1)
             if DruidBuffSettings.rebuffThreshold == nil then
                 DruidBuffSettings.rebuffThreshold = 10
             end
-            for _, spell in ipairs({ "Mark of the Wild", "Omen of Clarity", "Thorns" }) do
+            for _, spell in ipairs({ "Mark of the Wild", "Thorns" }) do
                 if DruidBuffSettings[spell] and DruidBuffSettings[spell].smartCast == nil then
                     DruidBuffSettings[spell].smartCast = true
                 end
@@ -42,7 +42,7 @@ end)
 _G["BINDING_HEADER_DRUIDBUFFDR_HEADER"] = "Druid Buff Downranker"
 _G["BINDING_NAME_CLICK SmartMotW:LeftButton"] = "DruidBuff: Cast Smart MotW"
 _G["BINDING_NAME_CLICK SmartThorns:LeftButton"] = "DruidBuff: Cast Smart Thorns"
-_G["BINDING_NAME_CLICK SmartOmen:LeftButton"] = "DruidBuff: Cast Smart Omen"
+-- Omen of Clarity is passive (no keybinding)
 _G["BINDING_NAME_CLICK SmartBuffAutoBtn:LeftButton"] = "DruidBuff: Cast Smart Auto Buff"
 
 -- --- OPTIONS PANEL HIERARCHY SETUP (Modern Settings API) ---
@@ -137,8 +137,8 @@ local function CreateToggle(spellName, yOffset, hasMouseover, hasTanksOnly)
 end
 
 CreateToggle("Mark of the Wild", -50, true, false)
-CreateToggle("Omen of Clarity", -80, false, false)
-CreateToggle("Thorns", -110, true, true)
+-- Omen of Clarity is passive (no toggle)
+CreateToggle("Thorns", -80, true, true)
 
 local showBarToggle = CreateFrame("CheckButton", "DruidBuffCheck_ShowActionBar", optionsFrame,
     "InterfaceOptionsCheckButtonTemplate")

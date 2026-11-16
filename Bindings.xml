@@ -3,8 +3,6 @@
 	</Binding>
 	<Binding name="CLICK SmartThorns:LeftButton" category="ADDONS">
 	</Binding>
-	<Binding name="CLICK SmartOmen:LeftButton" category="ADDONS">
-	</Binding>
 	<Binding name="CLICK SmartBuffAutoBtn:LeftButton" category="ADDONS">
 	</Binding>
 </Bindings>

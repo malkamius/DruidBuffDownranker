@@ -9,6 +9,7 @@
 .githooks/
 .vscode/
 *.ps1
+*.zip
 export_commits.ps1
 wow_paths.json
 .curseignore
